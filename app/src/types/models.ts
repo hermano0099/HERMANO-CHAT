@@ -14,6 +14,14 @@ export type Conversation = {
   created_at: string;
 };
 
+export type ConversationMember = {
+  conversation_id: string;
+  user_id: string;
+  role: 'owner' | 'member';
+  joined_at?: string;
+  last_read_at?: string | null;
+};
+
 export type InboxItem = Conversation & {
   displayTitle: string;
   subtitle: string;

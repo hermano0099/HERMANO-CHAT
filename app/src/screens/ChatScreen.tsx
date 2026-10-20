@@ -31,11 +31,37 @@ export function ChatScreen({ conversation, userId }: { conversation: Conversatio
   }, [conversation.id]);
 
 const markAsRead = useCallback(async () => {
+  const lastReadAt = new Date().toISOString();
+
+  const { data: membership, error: lookupError } = await supabase
+    .from('conversation_members')
+    .select('conversation_id,user_id')
+    .eq('conversation_id', conversation.id)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error('Errore recupero membership:', lookupError.message);
+    return;
+  }
+
+  if (!membership) {
+    const { error: insertError } = await supabase.from('conversation_members').insert({
+      conversation_id: conversation.id,
+      user_id: userId,
+      role: 'member',
+      last_read_at: lastReadAt,
+    });
+
+    if (insertError) {
+      console.error('Errore aggiornamento lettura:', insertError.message);
+    }
+    return;
+  }
+
   const { error } = await supabase
     .from('conversation_members')
-    .update({
-      last_read_at: new Date().toISOString(),
-    })
+    .update({ last_read_at: lastReadAt })
     .eq('conversation_id', conversation.id)
     .eq('user_id', userId);
 
@@ -58,7 +84,7 @@ useEffect(() => {
     .subscribe();
   return () => { supabase.removeChannel(channel); };
 }, [conversation.id, reload, reloadAndMarkAsRead]);
-
+ 
   async function send() {
     const body = draft.trim();
     if (!body || sending) return;
@@ -67,7 +93,11 @@ useEffect(() => {
     const { error } = await supabase.from('messages').insert({ conversation_id: conversation.id, author_id: userId, body });
     setSending(false);
     if (error) Alert.alert('Messaggio non inviato', error.message);
-    else { setDraft(''); reload(); }
+    else {
+      setDraft('');
+      await markAsRead();
+      await reload();
+    }
   }
 
   async function inviteMember() {
