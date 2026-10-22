@@ -1,0 +1,31 @@
+{
+  "version": "5",
+  "remote": {
+    "https://esm.sh/@supabase/supabase-js@2.78.0": "a3324194502542b35793070a5f666e253a764baa74a410d309b25764666014a4"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@supabase/supabase-js@^2.78.0",
+        "npm:@types/react@~19.2.4",
+        "npm:expo-asset@~57.0.20",
+        "npm:expo-audio@57.0",
+        "npm:expo-constants@~57.0.22",
+        "npm:expo-image-picker@~57.0.20",
+        "npm:expo-notifications@~57.0.23",
+        "npm:expo-secure-store@~57.0.4",
+        "npm:expo-sqlite@~57.0.4",
+        "npm:expo-video@~57.0.5",
+        "npm:expo@57.0",
+        "npm:react-dom@19.2.3",
+        "npm:react-native-maps@1.27.2",
+        "npm:react-native-safe-area-context@5.7",
+        "npm:react-native-url-polyfill@2",
+        "npm:react-native-web@0.21",
+        "npm:react-native@0.86.3",
+        "npm:react@19.2.3",
+        "npm:typescript@~6.0.3"
+      ]
+    }
+  }
+}

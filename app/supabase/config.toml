@@ -1,0 +1,7 @@
+project_id = "hermano-chat"
+
+[functions.delete-account]
+verify_jwt = true
+
+[functions.push-notification]
+verify_jwt = true

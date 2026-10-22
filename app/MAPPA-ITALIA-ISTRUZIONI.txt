@@ -1,0 +1,32 @@
+HERMANO CHAT — MODULO RISTORANTI
+
+Il modulo ora usa solo: Nome ristorante, Città, Canale HERMANO CHAT, Sito web, Descrizione.
+Nessun indirizzo preciso o coordinata obbligatoria per l'utente. Dopo aver cercato la città,
+l'utente deve selezionare il risultato corretto, perché città omonime possono esistere.
+Le coordinate della città, non la posizione del ristorante, vengono salvate nel database.
+
+1) Il codice attuale e' gia' in app/src/screens/MapScreen.tsx.
+   Non caricare o estrarre il vecchio archivio ZIP: potrebbe sovrascrivere
+   modifiche recenti.
+
+2) Prima di usare la mappa, verifica in Supabase se la migration
+   app/supabase/migrations/002_map_city_channel.sql e' gia' applicata.
+   Se manca, fai un backup e applicala una volta nel SQL Editor.
+
+3) Da app/ verifica:
+     npx tsc --noEmit
+   Se Expo e' gia avviato, torna al terminale Expo e premi r per ricaricare l'app.
+   Se non e' avviato, esegui:
+     npx expo start --tunnel --clear
+
+4) Verifica prova con città (es. Bari) > Cerca città > seleziona Bari, Puglia.
+   Il canale HERMANO CHAT va creato prima tramite Cerca > Canali, come canale pubblico.
+   Poi puoi selezionarlo nel modulo. Se nessun canale e' selezionato, il campo e' facoltativo.
+   Invia: solo una proposta in attesa. Entra nel pannello Team e approva dopo verifica.
+   Clicca il segnaposto approvato per aprire il canale e il sito web.
+
+NOTA: la ricerca geografica usa Open-Meteo Geocoding gratuito per uso NON commerciale;
+per pubblicazione con sponsorizzazioni servirà un geocoder con licenza commerciale.
+Dati città: Open-Meteo, CC BY 4.0. Non affermare che il segnaposto indica l'indirizzo esatto.
+
+Prima di un lancio pubblico serve testare gli accessi RLS, la moderazione e i link.

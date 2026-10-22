@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "HERMANO CHAT",
+    "slug": "hermano-chat",
+    "scheme": "hermanochat",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#07132C",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.hermanodelsur.chat",
+      "icon": "./assets/icon.png",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.hermanodelsur.chat",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#07132C"
+      }
+    },
+    "extra": {
+      "description": "HERMANO CHAT - MVP chat, gruppi, canali e mappa verificata",
+      "eas": {
+        "projectId": "9b84c266-80e4-4623-98a1-9fc37bd30256"
+      }
+    },
+    "icon": "./assets/icon.png",
+    "plugins": [
+      "expo-video",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Consenti a HERMANO CHAT di registrare messaggi vocali."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Consenti a HERMANO CHAT di selezionare foto e video da inviare nelle chat.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      "expo-notifications",
+      "expo-asset",
+      "expo-secure-store"
+    ]
+  }
+}

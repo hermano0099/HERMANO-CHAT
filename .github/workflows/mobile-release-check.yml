@@ -1,0 +1,29 @@
+name: Mobile release checks
+
+on:
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/mobile-release-check.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - ".github/workflows/mobile-release-check.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run release:check
+      - run: npx expo export --platform android --output-dir /tmp/hermano-android
+      - run: npx expo export --platform ios --output-dir /tmp/hermano-ios

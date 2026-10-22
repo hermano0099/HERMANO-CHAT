@@ -1,0 +1,19 @@
+HERMANO CHAT - COME PROVARE DA IPHONE
+
+1) NON pagare Emergent: il codice qui e' un progetto nuovo.
+2) Il codice e' gia' nella cartella app/ del repository GitHub.
+   Apri il repository in Codespaces (Safari > Richiedi sito desktop se serve).
+3) In Supabase esegui solo le migration non ancora applicate, in ordine.
+   Fai prima un backup e prova la cancellazione account su staging.
+4) Conserva da Supabase soltanto Project URL + publishable key.
+   Non condividere service_role key, segreti o password.
+5) Da app/, crea .env da .env.example e inserisci solo queste due chiavi.
+   Non fare commit di .env.
+6) Esegui npm ci e npm run start; apri il link con Expo Go sull'iPhone.
+7) Prova con DUE account diversi.
+
+Il progetto include build Expo e cancellazione account, ma NON e' pronto
+per gli store finche' non sono conclusi i test reali su Supabase, iPhone e
+Android, la configurazione push, l'informativa privacy e le credenziali di firma.
+Per distribuire via App Store e Google Play servono inoltre gli account sviluppatore.
+Premium e pagamenti non fanno parte del rilascio MVP.
