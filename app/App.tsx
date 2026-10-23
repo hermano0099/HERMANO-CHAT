@@ -44,7 +44,14 @@ export default function App() {
 
   useEffect(() => {
     if (!configured) { setChecking(false); return; }
-    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setChecking(false); });
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) throw error;
+      setSession(data.session);
+    }).catch(error => {
+      console.warn('Ripristino sessione:', error instanceof Error ? error.message : error);
+      Alert.alert('Sessione non disponibile', error instanceof Error ? error.message : 'Accedi di nuovo per continuare.');
+      setSession(null);
+    }).finally(() => setChecking(false));
     const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
       if (!next) { setProfile(null); setIsAdmin(false); setPage('chats'); setTab('chats'); }
@@ -54,11 +61,12 @@ export default function App() {
 
   const loadProfile = useCallback(async () => {
     if (!session?.user.id) return;
-    const [{ data: p, error }, { data: a }] = await Promise.all([
+    const [{ data: p, error }, { data: a, error: adminError }] = await Promise.all([
       supabase.from('profiles').select('id,username,display_name').eq('id', session.user.id).maybeSingle(),
       supabase.from('app_admins').select('user_id').eq('user_id', session.user.id).maybeSingle(),
     ]);
     if (error) console.warn('Profilo:', error.message);
+    if (adminError) console.warn('Ruolo amministratore:', adminError.message);
     setProfile(p as Profile | null);
     setIsAdmin(!!a);
   }, [session?.user.id]);

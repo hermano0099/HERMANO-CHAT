@@ -10,7 +10,19 @@ declare const process: { env: Record<string, string | undefined> };
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-export const configured = Boolean(url && key && !url.includes('YOUR-PROJECT'));
+function hasValidConfiguration() {
+  if (!url?.trim() || !key?.trim()) return false;
+  const validKey = /^(sb_publishable_[A-Za-z0-9_-]{20,}|eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/.test(key.trim());
+  if (!validKey) return false;
+  try {
+    const parsedUrl = new URL(url);
+    return ['https:', 'http:'].includes(parsedUrl.protocol) && !!parsedUrl.hostname;
+  } catch {
+    return false;
+  }
+}
+
+export const configured = hasValidConfiguration();
 
 const authStorage = {
   getItem: (storageKey: string) => Platform.OS === 'web'

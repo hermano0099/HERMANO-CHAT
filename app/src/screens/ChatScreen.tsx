@@ -209,6 +209,12 @@ const reloadAndMarkAsRead = useCallback(async () => {
   await markAsRead();
 }, [markAsRead, reload]);
 
+function refreshAfterSend() {
+  void Promise.all([markAsRead(), reload()]).catch(error => {
+    Alert.alert('Aggiornamento chat', error instanceof Error ? error.message : 'Non è stato possibile aggiornare la conversazione.');
+  });
+}
+
 useEffect(() => {
   reloadAndMarkAsRead();
 
@@ -230,33 +236,34 @@ useEffect(() => {
     if (!body || sending) return;
     if (body.length > 4000) { Alert.alert('Testo troppo lungo', 'Massimo 4000 caratteri.'); return; }
     setSending(true);
-    let sentMessageId: string | null = null;
-    let error: { message: string } | null;
-    if (editingMessage) {
-      const result = await supabase.from('messages').update({ body }).eq('id', editingMessage.id);
-      error = result.error;
-    } else {
-      const result = await supabase.from('messages').insert({
-        conversation_id: conversation.id,
-        author_id: userId,
-        body,
-        reply_to_message_id: replyTo?.id ?? null,
-      }).select('id').single();
-      error = result.error;
-      sentMessageId = result.data?.id || null;
-    }
-    if (error) {
+    try {
+      let sentMessageId: string | null = null;
+      if (editingMessage) {
+        const { error } = await supabase.from('messages').update({ body }).eq('id', editingMessage.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('messages').insert({
+          conversation_id: conversation.id,
+          author_id: userId,
+          body,
+          reply_to_message_id: replyTo?.id ?? null,
+        }).select('id').single();
+        if (error) throw error;
+        sentMessageId = data.id;
+      }
+      setDraft('');
+      setReplyTo(null);
+      setEditingMessage(null);
+      if (sentMessageId) void notifyAfterSend(sentMessageId);
+      refreshAfterSend();
+    } catch (error) {
+      Alert.alert(
+        editingMessage ? 'Modifica non salvata' : 'Messaggio non inviato',
+        error instanceof Error ? error.message : 'Si è verificato un errore durante l’invio.'
+      );
+    } finally {
       setSending(false);
-      Alert.alert(editingMessage ? 'Modifica non salvata' : 'Messaggio non inviato', error.message);
-      return;
     }
-    if (sentMessageId) await notifyAfterSend(sentMessageId);
-    setDraft('');
-    setReplyTo(null);
-    setEditingMessage(null);
-    await markAsRead();
-    await reload();
-    setSending(false);
   }
 
   function chooseAttachment() {
@@ -327,11 +334,10 @@ useEffect(() => {
         throw messageError;
       }
 
-      await notifyAfterSend(sentMessage.id);
+      void notifyAfterSend(sentMessage.id);
       setDraft('');
       setReplyTo(null);
-      await markAsRead();
-      await reload();
+      refreshAfterSend();
     } catch (error) {
       Alert.alert('Allegato non inviato', error instanceof Error ? error.message : 'Si è verificato un errore durante l’invio.');
     } finally {
@@ -431,11 +437,10 @@ useEffect(() => {
         throw messageError;
       }
 
-      await notifyAfterSend(sentMessage.id);
+      void notifyAfterSend(sentMessage.id);
       discardVoiceRecording();
       setReplyTo(null);
-      await markAsRead();
-      await reload();
+      refreshAfterSend();
     } catch (error) {
       Alert.alert('Vocale non inviato', `${stage}:\n${describeVoiceSendError(error)}`);
     } finally {
@@ -562,7 +567,7 @@ useEffect(() => {
         }
         throw error;
       }
-      await notifyAfterSend(sentMessage.id);
+      void notifyAfterSend(sentMessage.id);
       setForwardSource(null);
       Alert.alert('Messaggio inoltrato', `Inviato a ${destination.label}.`);
     } catch (error) {

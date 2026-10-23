@@ -47,12 +47,13 @@ Le notifiche push sono facoltative e si attivano dal Profilo. Dopo aver applicat
 4. Attiva le notifiche sul dispositivo dalla schermata Profilo e verifica ricezione, tap per aprire la chat e disattivazione.
 
 La funzione invia un avviso generico, non il testo del messaggio. Il repository non contiene credenziali APNs/FCM o token Expo; non inviare mai queste chiavi in chat.
+L’invio dei messaggi non attende la consegna push: se il servizio notifiche non è disponibile, il messaggio resta inviato e la notifica può non arrivare.
 
 ## 1.2 Eliminazione account e ambiente release
 
 - Distribuisci `supabase/functions/delete-account` e `supabase/functions/push-notification` con verifica JWT abilitata. `supabase/config.toml` imposta `verify_jwt = true`.
 - La cancellazione richiede una nuova verifica password, rimuove i messaggi e i media dell’utente e trasferisce le community con membri rimasti. Provala prima su un progetto staging e verifica i casi di account proprietario di gruppo/canale.
-- Imposta nell’ambiente EAS `production` `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `GOOGLE_MAPS_ANDROID_API_KEY` e `PRIVACY_CONTACT_EMAIL`. Non inserire `service_role` o token server nell’app. La chiave Google va limitata al package `com.hermanodelsur.chat` e alle impronte di firma corrette.
+- Imposta nell’ambiente EAS `production` `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` e `PRIVACY_CONTACT_EMAIL`; la build Android richiede anche `GOOGLE_MAPS_ANDROID_API_KEY` (non necessaria per iOS). La build production rifiuta URL Supabase non HTTPS, credenziali mancanti o chiavi non publishable (è supportata anche la vecchia chiave `anon` JWT); verifica inoltre che tutte le migration necessarie siano applicate al progetto corretto. Non inserire `service_role` o token server nell’app. La chiave Google va limitata al package `com.hermanodelsur.chat` e alle impronte di firma corrette.
 - Completa [PRIVACY.md](./PRIVACY.md) con identità/indirizzo del titolare, basi giuridiche e conservazione validate; pubblica l’informativa a un URL HTTPS e inserisci URL, contatto, termini e dichiarazioni dati nelle schede Apple/Google.
 - Configura credenziali EAS di firma iOS/Android e APNs/FCM v1, poi crea build installabili. Controlla `eas.json`: produzione genera Android App Bundle e release channel.
 

@@ -97,25 +97,27 @@ export function MapScreen({ userId, onChat }: {
     const area = citySelected.admin2 || citySelected.admin1 || 'Italia';
     const cityLabel = `${citySelected.name}, ${area}, Italia`.slice(0, 220);
     setSending(true);
-    const { error } = await supabase.from('restaurants').insert({
-      name: name.trim(),
-      address: cityLabel,
-      description: description.trim(),
-      latitude: citySelected.latitude,
-      longitude: citySelected.longitude,
-      website: website.trim() || null,
-      channel_id: channelId,
-      submitted_by: userId,
-      status: 'pending',
-      sponsored: false,
-    });
-    setSending(false);
-    if (error) {
-      Alert.alert('Invio non riuscito', error.message);
-    } else {
+    try {
+      const { error } = await supabase.from('restaurants').insert({
+        name: name.trim(),
+        address: cityLabel,
+        description: description.trim(),
+        latitude: citySelected.latitude,
+        longitude: citySelected.longitude,
+        website: website.trim() || null,
+        channel_id: channelId,
+        submitted_by: userId,
+        status: 'pending',
+        sponsored: false,
+      });
+      if (error) throw error;
       setPropose(false); setName(''); setCityQuery(''); setCitySelected(null);
       setCityResults([]); setDescription(''); setWebsite(''); setChannelId(null);
       Alert.alert('Proposta inviata', 'Il ristorante apparirà sulla mappa soltanto dopo le verifiche del team. La posizione sarà indicativa, al centro della città.');
+    } catch (error) {
+      Alert.alert('Invio non riuscito', error instanceof Error ? error.message : 'Si è verificato un errore durante l’invio.');
+    } finally {
+      setSending(false);
     }
   }
 
